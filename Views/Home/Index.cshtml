@@ -1,0 +1,311 @@
+﻿@model List<Lojinha.Models.CartItem>
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<style>
+    collapse navbar-collapse {
+        background-color: white;
+        outline: 1px solid red;
+    }
+
+
+    #productImg {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        margin-top: 50px;
+    }
+
+    .productItem {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+
+    .addItemBtn {
+        position: absolute;
+        left: -50px;
+        top: 70%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        font-weight: bold;
+        color: white;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+        .addItemBtn:hover {
+            background-color: #0056b3;
+        }
+
+    .productImg {
+        width: 300px;
+        height: 300px;
+    }
+
+    .productLabel {
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+        color: black;
+        margin-top: 10px;
+    }
+
+    #cartContainer {
+        position: relative;
+        display: inline-block;
+    }
+
+    .cartImg {
+        width: 50px;
+        height: auto;
+    }
+
+    .cart-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: red;
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+
+    #removeItemBtn {
+        margin-left: 50px;
+    }
+
+    #cartCounter {
+        display: none;
+    }
+
+    #removeItemQtdBtn {
+        display: none;
+    }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/simpleCart/3.0.6/simpleCart.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+<div id="cartContainer">
+    <img class="cartImg" src="@Url.Content("~/Content/images/cart.png")" alt="Cart">
+    <span id="cartCounter" class="cart-badge simpleCart_quantity">0</span>
+</div>
+
+
+<input id="removeItemBtn" type="button" value="Excluir selecionados" />
+<input id="clearCartBtn" type="button" value="Esvaziar carrinho" />
+
+<table id="cartTable">
+    <thead>
+        <tr>
+            <th>Produto</th>
+            <th>Preço</th>
+            <th>Quantidade</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+
+</table>
+
+
+<div id="productImg">
+    <div class="productItem">
+        <img class="productImg" src="@Url.Content("~/Content/images/smartphone.jpg")" alt="Smartphone" />
+        <div class="productInfo">
+            <p class="productLabel">Smartphone</p>
+            <h2 style="font:bold">R$999,99</h2>
+            <input class="addItemBtn" type="button" value="+" data-id="1" data-name="Smartphone" data-price="999" />
+        </div>
+    </div>
+
+    <div class="productItem">
+        <img class="productImg" src="@Url.Content("~/Content/images/purse.jpg")" alt="Bolsa" />
+        <div class="productInfo">
+            <p class="productLabel">Bolsa</p>
+            <h2 style="font:bold">R$150,99</h2>
+            <input class="addItemBtn" type="button" value="+" data-id="2" data-name="Bolsa" data-price="150.99" />
+        </div>
+    </div>
+
+    <div class="productItem">
+        <img class="productImg" src="@Url.Content("~/Content/images/pc.jpg")" alt="Computador" />
+        <div class="productInfo">
+            <p class="productLabel">Computador</p>
+            <h2 style="font:bold">R$3500,99</h2>
+            <input class="addItemBtn" type="button" value="+" data-id="3" data-name="Computador" data-price="3500.99" />
+        </div>
+    </div>
+</div>
+
+<script>
+    var cartData = [];
+
+    window.updateCartTable = function () {
+
+        $.ajax({
+            url: "/Home/LoadCart",
+            type: "GET",
+            success: function (data) {
+                var tableBody = $("#cartTable tbody");
+                tableBody.empty();
+                cartData = data;
+
+
+                if (!cartData || !cartData.cartItems || cartData.cartItems.length === 0) {
+                    tableBody.append("<tr><td colspan='5'>Carrinho vazio</td></tr>");
+                    return;
+                }
+
+
+                $.each(cartData.cartItems, function (index, item) {
+
+                    var productId = item.ProductId || "";
+                    var productName = item.ProductName || "";
+                    var price = item.Price || "";
+                    var quantity = item.Quantity || "";
+
+                    //var price = parseFloat($(this).data("price").toString().replace(".", ",")); // Ensure decimal format
+
+
+                    tableBody.append(`
+                        <tr class="cartContainer">
+                            <td><input type="checkbox" class="removeCheckbox" value="${productId}" /></td>
+                            <td>${productName}</td>
+                            <td>${price}</td>
+                            <td>${quantity}</td>
+                            <td><input type="button" class="removeItemQtdBtn" data-id=${productId} value="-" ${quantity > 1 ? '' : 'style="display:none"'} /></td>
+                        </tr>
+                    `);
+                });
+            }
+        });
+    };
+</script>
+
+<script>
+    $(document).ready(function () {
+        function updateCartCounter() {
+            $.ajax({
+                url: "/Home/GetCartItemCount",
+                type: "GET",
+                success: function (response) {
+                    if (response.count <= 0 || response.count == null) {
+                        $("#cartCounter").css("display", "none");
+                    } else {
+                        $("#cartCounter").text(response.count);
+                        $("#cartCounter").css("display", "flex");
+                    }
+                    updateCartTable();
+                },
+                error: function () {
+                    console.error("Não foi possível atualizar o carrinho.");
+                }
+            });
+        }
+
+
+        $(".addItemBtn").click(function () {
+            var productId = $(this).data("id");
+            var productName = $(this).data("name");
+            var price = $(this).data("price");
+            var quantity = 1;
+
+
+            $.ajax({
+                url: "/Home/AddToCartDb",
+                type: "POST",
+                data: { ProductId: productId, ProductName: productName, Price: price, Quantity: quantity },
+                success: function () {
+                    updateCartCounter();
+                },
+                error: function () {
+                    console.error("Erro ao adicionar item.");
+                }
+            });
+        });
+
+
+        $("#removeItemBtn").click(function () {
+            var selectedCheckboxes = $(".removeCheckbox:checked");
+            var productIdsToRemove = [];
+
+            selectedCheckboxes.each(function () {
+                productIdsToRemove.push($(this).val());
+            });
+
+
+            if (productIdsToRemove.length > 0) {
+                $.ajax({
+                    url: "/Home/DeleteFromCartDb",
+                    type: "POST",
+                    data: { ProductId2: productIdsToRemove.toString(), removerTodos: true },
+                    success: function () {
+                        updateCartCounter();
+                    },
+                    error: function () {
+                        console.error("Erro ao remover item.");
+                    }
+                });
+            } else {
+                console.log("Nenhum item selecionado.");
+            }
+        });
+
+
+        $("#clearCartBtn").click(function () {
+            $.ajax({
+                url: "/Home/ClearCartDb",
+                type: "POST",
+                success: function () {
+                    updateCartCounter();
+                    $(".cartContainer").remove();
+                },
+                error: function () {
+                    console.error("Erro ao esvaziar carrinho.");
+                }
+            });
+        });
+
+        updateCartCounter();
+
+
+        $(document).on("click", ".removeItemQtdBtn", function () {
+            {
+                var productId = $(this).data("id");
+
+                $.ajax({
+                    url: "/Home/DeleteFromCartDb",
+                    type: "POST",
+                    data: { ProductId2: productId.toString(), removerTodos: false },
+                    success: function () {
+                        updateCartCounter();
+                    },
+                    error: function () {
+                        console.error("Erro ao adicionar item.");
+                    }
+                });
+            }
+        });
+    });
+
+</script>
+
