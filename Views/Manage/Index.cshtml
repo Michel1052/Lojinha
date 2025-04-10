@@ -23,11 +23,11 @@
             }
             ]
         </dd>
-        <dt>Logins externos:</dt>
-        <dd>
+        @*<dt>Logins externos:</dt>*@
+        @*<dd>
             @Model.Logins.Count [
             @Html.ActionLink("Gerenciar", "ManageLogins") ]
-        </dd>
+        </dd>*@
         @*
             Os Números de Telefone podem ser usados como um segundo fator de verificação em um sistema de autenticação de dois fatores.
              
@@ -56,12 +56,12 @@
                 }
             </dd>
         *@
-        <dt>Autenticação de dois fatores:</dt>
+        @*<dt>Autenticação de dois fatores:</dt>
         <dd>
             <p>
                 Não há nenhum provedor de autenticação de dois fatores configurado. Confira <a href="https://go.microsoft.com/fwlink/?LinkId=403804">este artigo</a>
                 para obter detalhes de como configurar este aplicativo ASP.NET para permitir a autenticação de dois fatores.
-            </p>
+            </p>*@
             @*@if (Model.TwoFactor)
                 {
                     using (Html.BeginForm("DisableTwoFactorAuthentication", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
@@ -82,6 +82,6 @@
                         </text>
                     }
                 }*@
-        </dd>
+        @*</dd>*@
     </dl>
 </div>

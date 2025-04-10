@@ -17,5 +17,13 @@ namespace Lojinha
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
+
+        protected void Application_BeginRequest()
+        {
+            var culture = new System.Globalization.CultureInfo("pt-BR");
+            System.Threading.Thread.CurrentThread.CurrentCulture = culture;
+            System.Threading.Thread.CurrentThread.CurrentUICulture = culture;
+        }
+
     }
 }

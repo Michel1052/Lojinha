@@ -1,0 +1,55 @@
+## Ignore build results
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.cache
+*.log
+
+## Ignore Visual Studio files
+.vscode/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Ignore NuGet packages
+packages/
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Ignore ReSharper and Rider files
+*.DotSettings.user
+.idea/
+
+## Ignore temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.DS_Store
+Thumbs.db
+
+## Ignore web publish output
+publish/
+wwwroot/
+
+## Ignore database files
+App_Data/*.mdf
+App_Data/*.ldf
+
+## Optional: if you're using localdb with auto-attached .mdf
+*.mdf
+*.ldf
+
+## Ignore environment configs
+appsettings.Development.json
+secrets.json
+
+## Ignore JetBrains Rider files
+.idea/
