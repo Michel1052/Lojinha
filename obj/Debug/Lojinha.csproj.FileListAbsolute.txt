@@ -123,3 +123,5 @@ C:\Users\miche\source\repos\Lojinha\obj\Debug\Lojinha.csproj.CopyComplete
 C:\Users\miche\source\repos\Lojinha\obj\Debug\Lojinha.dll
 C:\Users\miche\source\repos\Lojinha\obj\Debug\Lojinha.pdb
 C:\Users\miche\source\repos\Lojinha\obj\Debug\Lojinha.csproj.AssemblyReference.cache
+C:\Users\miche\source\repos\Lojinha\obj\Debug\Lojinha.Migrations.InitialCreate.resources
+C:\Users\miche\source\repos\Lojinha\obj\Debug\Lojinha.csproj.GenerateResource.cache

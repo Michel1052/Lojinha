@@ -9,6 +9,11 @@ using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Globalization;
 using Lojinha.Models;
+using System.Threading.Tasks;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace Lojinha.Controllers
 {
@@ -359,10 +364,10 @@ namespace Lojinha.Controllers
 
 
         //API MERCADO PAGO
-        /*// Action para iniciar o pagamento
-        public ActionResult Pagar()
+        // Action para iniciar o pagamento
+        /*public ActionResult Pagar()
         {
-            MercadoPago.SDK.AccessToken = "SEU_ACCESS_TOKEN_DE_TESTE";
+            MercadoPago.SDK.AccessToken = "TEST-1862069787978873-030721-7dbb3b36e00cd2608767ccf9b5b3fafc-243476245";
 
             var preference = new Preference();
 
@@ -387,6 +392,104 @@ namespace Lojinha.Controllers
             var redirectUrl = preference.InitPoint;
             return Redirect(redirectUrl);
         }*/
+
+        /*public async Task<ActionResult> Pagar()
+        {
+            using (var client = new HttpClient())
+            {
+                // Token de teste do Mercado Pago (pego no painel)
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", "TEST-1862069787978873-030721-7dbb3b36e00cd2608767ccf9b5b3fafc-243476245");
+
+                var preference = new
+                {
+                    items = new[]
+                    {
+                new
+                {
+                    title = "Produto de Teste",
+                    quantity = 1,
+                    unit_price = 100
+                }
+            },
+                    back_urls = new
+                    {
+                        success = "https://portfolio-8v4.pages.dev/sucesso",
+                        failure = "https://www.seusite.com/falha",
+                        pending = "https://www.seusite.com/pendente"
+                    },
+                    auto_return = "all"
+                };
+
+                var json = JsonConvert.SerializeObject(preference);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync("https://api.mercadopago.com/checkout/preferences", content);
+                var result = await response.Content.ReadAsStringAsync();
+
+                dynamic resposta = JsonConvert.DeserializeObject(result);
+                string initPoint = resposta.init_point;
+
+                return Redirect(initPoint);
+            }
+        }*/
+
+        public async Task<ActionResult> Pagar()
+        {
+            using (var client = new HttpClient())
+            {
+                // Token de teste do Mercado Pago (pego no painel)
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", "TEST-1862069787978873-030721-7dbb3b36e00cd2608767ccf9b5b3fafc-243476245");
+
+                string userId = User.Identity.GetUserId();
+                ApplicationDbContext db = new ApplicationDbContext();
+                var cartItems = db.CartItems.Where(c => c.UserId == userId)
+                .Select(c => new { c.ProductId, c.ProductName, c.Price, c.Quantity }).ToList();
+
+
+                var item = cartItems.Select(c => new
+                {
+                    title = c.ProductName,
+                    quantity = c.Quantity,
+                    unit_price = c.Price
+                }).ToList();
+
+                var preference = new
+                {
+
+
+                    items = item,
+
+
+                        back_urls = new
+                        {
+                            success = "https://portfolio-8v4.pages.dev/sucesso",
+                            failure = "https://www.seusite.com/falha",
+                            pending = "https://www.seusite.com/pendente"
+                        },
+                        auto_return = "all"
+                    };
+
+
+                if (preference.items == null || !preference.items.Any())
+                {
+                    throw new Exception("A preferência não contém itens. Verifique o carrinho.");
+                }
+
+
+                    var json = JsonConvert.SerializeObject(preference);                
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                    var response = await client.PostAsync("https://api.mercadopago.com/checkout/preferences", content);
+                    var result = await response.Content.ReadAsStringAsync();
+
+                    dynamic resposta = JsonConvert.DeserializeObject(result);
+                    string initPoint = resposta.init_point;
+                
+                    return Redirect(initPoint);                
+            }
+        }
     }
 }
 
